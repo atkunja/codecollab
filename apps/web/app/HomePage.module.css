@@ -1,0 +1,186 @@
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #17192d 0%, #202442 100%);
+  color: #f5f6fa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 60px;
+  position: relative;
+}
+
+.navbar {
+  position: absolute;
+  top: 25px;
+  left: 32px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 10;
+}
+
+.signInButton {
+  background: #4285F4;
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  border-radius: 7px;
+  padding: 7px 16px;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+
+.signInButton:hover { background: #357ae8; }
+
+.signedBox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.signedText {
+  font-size: 14px;
+  color: #eee;
+}
+.signOutButton {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  padding: 7px 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.signOutButton:hover { background: #b91c1c; }
+
+.logoContainer {
+  margin-bottom: 12px;
+}
+.logo {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  box-shadow: 0 2px 18px 0 #3fe6e6a9;
+  display: block;
+  margin: 0 auto;
+  background: #111425;
+}
+
+.title {
+  font-size: 2.8rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+  color: #44e7db;
+  text-align: center;
+}
+.subtitle {
+  font-size: 1.08rem;
+  color: #a5b6de;
+  margin-bottom: 36px;
+  text-align: center;
+}
+
+.formRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 18px;
+  margin: 18px 0 30px 0;
+  justify-content: center;
+}
+.form {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0;
+  background: #22243b;
+  border-radius: 12px;
+  box-shadow: 0 3px 16px 0 #111425a3;
+}
+
+.input {
+  border: none;
+  border-radius: 12px 0 0 12px;
+  background: #232334;
+  color: #f5f6fa;
+  font-size: 1rem;
+  padding: 14px 14px;
+  min-width: 190px;
+  max-width: 220px;
+  outline: none;
+  transition: background 0.2s;
+}
+.input:focus { background: #24274a; }
+
+.joinButton {
+  border: none;
+  border-radius: 0 12px 12px 0;
+  background: linear-gradient(90deg, #4fd1c5, #5b6ee1);
+  color: #17212b;
+  font-weight: 700;
+  padding: 14px 30px;
+  font-size: 1.08rem;
+  cursor: pointer;
+  transition: filter 0.14s, opacity 0.12s;
+  box-shadow: 0 1px 7px 0 #0d1021a2;
+}
+.joinButton:active { filter: brightness(0.94); }
+.joinButton:hover { opacity: 0.91; }
+
+.createLink {
+  margin-left: 0px;
+}
+.createButton {
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #54e6c1, #76a7fa 90%);
+  color: #17212b;
+  font-weight: 700;
+  padding: 14px 32px;
+  font-size: 1.08rem;
+  cursor: pointer;
+  transition: filter 0.14s, opacity 0.12s;
+  box-shadow: 0 1px 7px 0 #0d1021a2;
+}
+.createButton:active { filter: brightness(0.93); }
+.createButton:hover { opacity: 0.90; }
+
+.tip {
+  color: #44e7db;
+  margin-top: 32px;
+  text-align: center;
+  font-size: 1.03rem;
+}
+.tip b { color: #44e7db; }
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  background: #191a2bdb;
+  text-align: center;
+  font-size: 1rem;
+  padding: 10px 0 7px 0;
+  border-top: 1px solid #232334;
+  color: #b2c8e8;
+}
+.email {
+  color: #44e7db;
+  text-decoration: underline;
+}
+@media (max-width: 700px) {
+  .formRow {
+    flex-direction: column;
+    gap: 15px;
+  }
+  .input, .joinButton, .createButton {
+    font-size: 0.98rem;
+    padding: 12px 10px;
+    min-width: 130px;
+  }
+  .footer { font-size: 0.93rem; }
+  .logo { width: 84px; height: 84px; }
+}

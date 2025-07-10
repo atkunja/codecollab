@@ -1,0 +1,120 @@
+.container {
+  min-height: 100vh;
+  padding: 32px;
+  background: linear-gradient(135deg, #181824 0%, #232334 100%);
+  color: #f1f1f6;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+}
+
+.header {
+  font-size: 2.4rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #4fd1c5;
+}
+
+.userInfo {
+  color: #aaa;
+  margin-bottom: 18px;
+}
+
+.errorBanner {
+  background: #c0392b;
+  color: #fff;
+  border-radius: 6px;
+  padding: 16px;
+  font-weight: bold;
+  margin: 16px 0;
+}
+
+.roomInfo {
+  margin-bottom: 12px;
+}
+
+.deleteBtn {
+  background: #c0392b;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 18px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+
+.deleteBtn[disabled] {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.usersList {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.userListItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.userAvatar {
+  border-radius: 50%;
+  border: 1px solid #333;
+  object-fit: cover;
+}
+
+.chatSection {
+  margin: 16px 0;
+  background: #232334;
+  border-radius: 8px;
+  padding: 12px;
+  max-width: 580px;
+}
+
+.chatMessages {
+  height: 120px;
+  overflow-y: auto;
+  background: #111;
+  color: #fff;
+  border-radius: 6px;
+  padding: 8px;
+  margin: 8px 0;
+  font-size: 15px;
+}
+
+.inputForm {
+  display: flex;
+  gap: 8px;
+}
+
+.inputMessage {
+  flex: 1;
+  border-radius: 4px;
+  border: 1px solid #222;
+  padding: 6px;
+  background: #232334;
+  color: #fff;
+}
+
+.sendBtn {
+  border-radius: 4px;
+  background: #4fd1c5;
+  color: #232334;
+  border: none;
+  padding: 0 16px;
+  font-weight: bold;
+}
+
+.selectLang {
+  margin-bottom: 8px;
+  padding: 4px 8px;
+  font-size: 16px;
+  background: #181824;
+  color: #fff;
+  border-radius: 5px;
+  border: 1px solid #232334;
+}
