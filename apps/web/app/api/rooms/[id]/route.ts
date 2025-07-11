@@ -1,12 +1,8 @@
 import type { NextRequest } from "next/server";
 
-interface Context {
-  params: { id: string }
-}
-
 export async function GET(
   request: NextRequest,
-  { params }: Context
+  { params }: { params: { id: string } }
 ) {
   const { id } = params;
   const apiUrl = `http://localhost:3001/rooms/${id}`;
@@ -25,7 +21,7 @@ export async function GET(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: Context
+  { params }: { params: { id: string } }
 ) {
   const { id } = params;
   const apiUrl = `http://localhost:3001/rooms/${id}`;
@@ -49,7 +45,7 @@ export async function DELETE(
 
 export async function POST(
   request: NextRequest,
-  { params }: Context
+  { params }: { params: { id: string } }
 ) {
   const { id } = params;
   const apiUrl = `http://localhost:3001/rooms/${id}`;
