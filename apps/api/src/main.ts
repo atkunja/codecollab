@@ -5,11 +5,10 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // ENABLE CORS SO FRONTEND CAN TALK TO BACKEND
   app.enableCors({
     origin: [
-      'https://codecollab-psi.vercel.app/', // Vercel app URL
-      'http://localhost:3002', // local Next.js dev (optional)
+      'https://codecollab-uuoyp6clb-atkunjas-projects.vercel.app', // Vercel frontend URL
+      'http://localhost:3002', // Local dev
     ],
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
