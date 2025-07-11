@@ -1,10 +1,19 @@
 import type { NextRequest } from "next/server";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { id } = params;
+function getIdFromPath(pathname: string): string | null {
+  const parts = pathname.split("/");
+  return parts.length ? parts[parts.length - 1] : null;
+}
+
+export async function GET(request: NextRequest) {
+  const id = getIdFromPath(request.nextUrl.pathname);
+  if (!id) {
+    return new Response(
+      JSON.stringify({ error: "Missing id parameter" }),
+      { status: 400 }
+    );
+  }
+
   const apiUrl = `http://localhost:3001/rooms/${id}`;
   try {
     const apiRes = await fetch(apiUrl);
@@ -19,11 +28,15 @@ export async function GET(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { id } = params;
+export async function DELETE(request: NextRequest) {
+  const id = getIdFromPath(request.nextUrl.pathname);
+  if (!id) {
+    return new Response(
+      JSON.stringify({ error: "Missing id parameter" }),
+      { status: 400 }
+    );
+  }
+
   const apiUrl = `http://localhost:3001/rooms/${id}`;
   const body = await request.text();
   try {
@@ -43,11 +56,15 @@ export async function DELETE(
   }
 }
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { id } = params;
+export async function POST(request: NextRequest) {
+  const id = getIdFromPath(request.nextUrl.pathname);
+  if (!id) {
+    return new Response(
+      JSON.stringify({ error: "Missing id parameter" }),
+      { status: 400 }
+    );
+  }
+
   const apiUrl = `http://localhost:3001/rooms/${id}`;
   const body = await request.text();
   try {
