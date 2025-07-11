@@ -1,19 +1,13 @@
 import type { NextRequest } from "next/server";
 
-type RouteContext = {
-  params: {
-    id: string;
-  };
-};
-
 export async function GET(
   request: NextRequest,
-  { params }: RouteContext
+  { params }: { params: { id: string } }
 ) {
   const { id } = params;
   const apiUrl = `http://localhost:3001/rooms/${id}`;
   try {
-    const apiRes = await fetch(apiUrl, { method: "GET" });
+    const apiRes = await fetch(apiUrl);
     const data = await apiRes.json();
     return new Response(JSON.stringify(data), { status: apiRes.status });
   } catch {
@@ -27,7 +21,7 @@ export async function GET(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: RouteContext
+  { params }: { params: { id: string } }
 ) {
   const { id } = params;
   const apiUrl = `http://localhost:3001/rooms/${id}`;
@@ -51,7 +45,7 @@ export async function DELETE(
 
 export async function POST(
   request: NextRequest,
-  { params }: RouteContext
+  { params }: { params: { id: string } }
 ) {
   const { id } = params;
   const apiUrl = `http://localhost:3001/rooms/${id}`;
