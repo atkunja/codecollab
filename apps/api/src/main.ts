@@ -7,7 +7,10 @@ async function bootstrap() {
 
   // ENABLE CORS SO FRONTEND CAN TALK TO BACKEND
   app.enableCors({
-    origin: 'http://localhost:3002', // Your Next.js frontend dev port
+    origin: [
+      'https://codecollab-uuoyp6clb-atkunjas-projects.vercel.app', // Vercel app URL
+      'http://localhost:3002', // local Next.js dev (optional)
+    ],
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   });
