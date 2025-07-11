@@ -6,8 +6,8 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  getHello() {
-    // Return a JSON object for health check
+  getHello(): any {
+    // Return a simple health check JSON
     return this.appService.getHello();
   }
 }

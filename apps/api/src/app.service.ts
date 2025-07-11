@@ -2,8 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AppService {
-  getHello() {
-    // Return a JSON object
+  getHello(): any {
     return { ok: true, message: 'Backend up!' };
   }
 }

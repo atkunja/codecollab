@@ -1,87 +1,76 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import styles from "./CreateRoom.module.css";
+import { useSession, signIn, signOut } from "next-auth/react";
+import Link from "next/link";
+import styles from "./HomePage.module.css";
 
-export default function CreateRoomPage() {
-  const router = useRouter();
+export default function HomePage() {
   const { data: session } = useSession();
-  const [name, setName] = useState("");
-  const [roomId, setRoomId] = useState("");
-  const [message, setMessage] = useState("");
+  const [roomInput, setRoomInput] = useState("");
 
-  async function handleCreate(e: React.FormEvent) {
+  function handleJoin(e: React.FormEvent) {
     e.preventDefault();
-    if (!name.trim()) {
-      setMessage("Room name required.");
-      return;
-    }
-    // Use only env variable for cloud, or fallback ONLY in local dev!
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-    if (!apiUrl) {
-      setMessage("API URL is not configured. (Contact admin)");
-      return;
-    }
-    const res = await fetch(`${apiUrl}/rooms/create`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name,
-        id: roomId || undefined,
-        creatorEmail: session?.user?.email || "",
-      }),
-    });
-    const data = await res.json();
-    if (data.success) {
-      setMessage("Room created!");
-      router.push(`/room/${data.id}`);
-    } else {
-      setMessage(data.error || "Failed to create room.");
-    }
+    if (!roomInput.trim()) return;
+    window.location.href = `/room/${roomInput.trim()}`;
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.title}>Create Room</div>
-      <form className={styles.form} onSubmit={handleCreate}>
-        <input
-          className={styles.input}
-          placeholder="Room name"
-          value={name}
-          onChange={e => setName(e.target.value)}
-          maxLength={32}
-          required
-        />
-        <input
-          className={styles.input}
-          placeholder="Room code (optional)"
-          value={roomId}
-          onChange={e => setRoomId(e.target.value)}
-          maxLength={32}
-        />
-        <button type="submit" className={styles.button}>
-          Create Room
-        </button>
-      </form>
-      {message && (
-        <div
-          className={
-            styles.message +
-            " " +
-            (message.startsWith("Room created") ? styles.success : styles.error)
-          }
-        >
-          {message}
-        </div>
-      )}
-      <div className={styles.footer}>
-        <b>Created by Ayush Kunjadia</b> —{" "}
-        <a href="mailto:atkunjadia@gmail.com" style={{ color: "#4fd1c5", textDecoration: "underline" }}>
+    <main className={styles.container}>
+      {/* Navbar for auth */}
+      <nav className={styles.navbar}>
+        {!session ? (
+          <button onClick={() => signIn("google")} className={styles.signInButton}>
+            Sign in with Google
+          </button>
+        ) : (
+          <div className={styles.signedBox}>
+            <span className={styles.signedText}>Signed in as: {session.user?.email}</span>
+            <button onClick={() => signOut()} className={styles.signOutButton}>
+              Sign out
+            </button>
+          </div>
+        )}
+      </nav>
+
+      {/* Logo and Title */}
+      <div className={styles.logoContainer}>
+        <img src="/codecollab-logo.png" alt="CodeCollab Logo" className={styles.logo} />
+      </div>
+      <h1 className={styles.title}>CodeCollab</h1>
+      <div className={styles.subtitle}>
+        Instantly create or join collaborative coding rooms
+      </div>
+
+      {/* Form Row */}
+      <div className={styles.formRow}>
+        <form onSubmit={handleJoin} className={styles.form}>
+          <input
+            value={roomInput}
+            onChange={(e) => setRoomInput(e.target.value)}
+            placeholder="Room code"
+            className={styles.input}
+            maxLength={24}
+          />
+          <button type="submit" className={styles.joinButton}>
+            Join Room
+          </button>
+        </form>
+        <Link href="/create-room" className={styles.createLink}>
+          <button className={styles.createButton}>Create Room</button>
+        </Link>
+      </div>
+
+      <p className={styles.tip}>
+        <b>Tip:</b> Share your room code to collaborate instantly.
+      </p>
+
+      <footer className={styles.footer}>
+        Created by Ayush Kunjadia — Contact:{" "}
+        <a href="mailto:atkunjadia@gmail.com" className={styles.email}>
           atkunjadia@gmail.com
         </a>
-      </div>
-    </div>
+      </footer>
+    </main>
   );
 }
