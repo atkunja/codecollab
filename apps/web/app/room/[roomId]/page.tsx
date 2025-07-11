@@ -12,6 +12,7 @@ const MonacoEditor = dynamic(() => import("@monaco-editor/react"), { ssr: false 
 const socket = io("http://localhost:3001");
 
 type User = { email: string; name?: string; image?: string };
+type Message = { sender: string; message: string; created_at?: string };
 
 export default function RoomPage({ params }: { params: Promise<{ roomId: string }> }) {
   const { roomId } = use(params);
@@ -20,9 +21,7 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
   const [code, setCode] = useState("// Start coding!");
   const [users, setUsers] = useState<User[]>([]);
   const [language, setLanguage] = useState("javascript");
-  const [messages, setMessages] = useState<
-    { sender: string; message: string; created_at?: string }[]
-  >([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [chatInput, setChatInput] = useState("");
   const [joinError, setJoinError] = useState<string | null>(null);
   const [roomInfo, setRoomInfo] = useState<{ name?: string; creator_email?: string } | null>(null);
@@ -58,17 +57,23 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
       setMessages([]);
       setUsers([]);
     });
-    socket.on(
-      "codeUpdate",
-      (data: { code?: string; language?: string } | string) => {
-        if (typeof data === "string") setCode(data);
-        else if (data?.code) setCode(data.code);
-        if (typeof data === "object" && data?.language) setLanguage(data.language);
-      }
-    );
+
+    socket.on("codeUpdate", (data: { code?: string; language?: string }) => {
+      if (typeof data === "string") setCode(data);
+      else if (data?.code) setCode(data.code);
+      if (data?.language) setLanguage(data.language);
+    });
+
     socket.on("roomUsers", (u: User[]) => setUsers(u));
-    socket.on("newChatMessage", (msg: any) => setMessages((prev) => [...prev, msg]));
-    socket.on("chatHistory", (history: any[]) => setMessages(history || []));
+
+    socket.on("newChatMessage", (msg: Message) =>
+      setMessages((prev) => [...prev, msg])
+    );
+
+    socket.on("chatHistory", (history: Message[]) =>
+      setMessages(history || [])
+    );
+
     return () => {
       socket.off("codeUpdate");
       socket.off("roomUsers");
