@@ -3,7 +3,7 @@ import styles from "./room.module.css";
 
 import { use } from "react";
 import { useSession } from "next-auth/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import io from "socket.io-client";
 import dynamic from "next/dynamic";
 
@@ -12,7 +12,6 @@ const MonacoEditor = dynamic(() => import("@monaco-editor/react"), { ssr: false 
 const socket = io("http://localhost:3001");
 
 type User = { email: string; name?: string; image?: string };
-type ChatMessage = { sender: string; message: string; created_at?: string };
 
 export default function RoomPage({ params }: { params: Promise<{ roomId: string }> }) {
   const { roomId } = use(params);
@@ -21,7 +20,9 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
   const [code, setCode] = useState("// Start coding!");
   const [users, setUsers] = useState<User[]>([]);
   const [language, setLanguage] = useState("javascript");
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<
+    { sender: string; message: string; created_at?: string }[]
+  >([]);
   const [chatInput, setChatInput] = useState("");
   const [joinError, setJoinError] = useState<string | null>(null);
   const [roomInfo, setRoomInfo] = useState<{ name?: string; creator_email?: string } | null>(null);
@@ -57,15 +58,17 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
       setMessages([]);
       setUsers([]);
     });
-    socket.on("codeUpdate", (data: any) => {
-      if (typeof data === "string") setCode(data);
-      else if (data?.code) setCode(data.code);
-      if (data?.language) setLanguage(data.language);
-    });
+    socket.on(
+      "codeUpdate",
+      (data: { code?: string; language?: string } | string) => {
+        if (typeof data === "string") setCode(data);
+        else if (data?.code) setCode(data.code);
+        if (typeof data === "object" && data?.language) setLanguage(data.language);
+      }
+    );
     socket.on("roomUsers", (u: User[]) => setUsers(u));
-    // Only change below (fix the 'any' usage)
-    socket.on("newChatMessage", (msg: ChatMessage) => setMessages((prev) => [...prev, msg]));
-    socket.on("chatHistory", (history: ChatMessage[]) => setMessages(history || []));
+    socket.on("newChatMessage", (msg: any) => setMessages((prev) => [...prev, msg]));
+    socket.on("chatHistory", (history: any[]) => setMessages(history || []));
     return () => {
       socket.off("codeUpdate");
       socket.off("roomUsers");
