@@ -9,7 +9,7 @@ import dynamic from "next/dynamic";
 
 // Monaco Editor import (no SSR)
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
-const socket = io("http://localhost:3001");
+const socket = io(process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001");
 
 type User = { email: string; name?: string; image?: string };
 type Message = { sender: string; message: string; created_at?: string };

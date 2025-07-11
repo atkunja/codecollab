@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const apiUrl = `http://localhost:3001/rooms/${id}`;
+  const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/rooms/${id}`;
   try {
     const apiRes = await fetch(apiUrl);
     const data = await apiRes.json();
@@ -37,7 +37,7 @@ export async function DELETE(request: NextRequest) {
     );
   }
 
-  const apiUrl = `http://localhost:3001/rooms/${id}`;
+  const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/rooms/${id}`;
   const body = await request.text();
   try {
     const apiRes = await fetch(apiUrl, {
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const apiUrl = `http://localhost:3001/rooms/${id}`;
+  const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/rooms/${id}`;
   const body = await request.text();
   try {
     const apiRes = await fetch(apiUrl, {
