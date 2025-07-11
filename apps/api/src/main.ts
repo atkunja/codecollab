@@ -8,13 +8,13 @@ async function bootstrap() {
   // ENABLE CORS SO FRONTEND CAN TALK TO BACKEND
   app.enableCors({
     origin: [
-      'https://codecollab-bjimey94s-atkunjas-projects.vercel.app/', // Vercel app URL
+      'https://codecollab-psi.vercel.app/', // Vercel app URL
       'http://localhost:3002', // local Next.js dev (optional)
     ],
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   });
 
-  await app.listen(process.env.PORT ?? 3001);
+  await app.listen(process.env.PORT ?? 3001, '0.0.0.0');
 }
 bootstrap();
