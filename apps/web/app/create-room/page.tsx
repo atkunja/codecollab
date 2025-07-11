@@ -18,7 +18,12 @@ export default function CreateRoomPage() {
       setMessage("Room name required.");
       return;
     }
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+    // Use only env variable for cloud, or fallback ONLY in local dev!
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    if (!apiUrl) {
+      setMessage("API URL is not configured. (Contact admin)");
+      return;
+    }
     const res = await fetch(`${apiUrl}/rooms/create`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

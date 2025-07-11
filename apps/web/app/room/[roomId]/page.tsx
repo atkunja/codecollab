@@ -1,15 +1,13 @@
 "use client";
 import styles from "./room.module.css";
-
 import { use } from "react";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
-import io from "socket.io-client";
+import { useEffect, useRef, useState } from "react";
+import io, { Socket } from "socket.io-client";
 import dynamic from "next/dynamic";
 
 // Monaco Editor import (no SSR)
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
-const socket = io(process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001");
 
 type User = { email: string; name?: string; image?: string };
 type Message = { sender: string; message: string; created_at?: string };
@@ -18,6 +16,10 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
   const { roomId } = use(params);
   const { data: session } = useSession();
 
+  // Use a ref so socket is not recreated every render
+  const socketRef = useRef<Socket | null>(null);
+
+  // UI state
   const [code, setCode] = useState("// Start coding!");
   const [users, setUsers] = useState<User[]>([]);
   const [language, setLanguage] = useState("javascript");
@@ -27,6 +29,22 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
   const [roomInfo, setRoomInfo] = useState<{ name?: string; creator_email?: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
+
+  // --- CREATE SOCKET ON MOUNT ---
+  useEffect(() => {
+    // Try env var, fallback to localhost
+    const url =
+      process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
+      "http://localhost:3001";
+    socketRef.current = io(url, { transports: ["websocket"] });
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
+    };
+  }, []);
 
   // Fetch room info from backend
   useEffect(() => {
@@ -44,7 +62,9 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
 
   // Join room, wire up sockets
   useEffect(() => {
-    if (!roomId || !session?.user?.email || joinError) return;
+    const socket = socketRef.current;
+    if (!socket || !roomId || !session?.user?.email || joinError) return;
+
     socket.emit("joinRoom", {
       roomId,
       email: session.user.email,
@@ -65,11 +85,9 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
     });
 
     socket.on("roomUsers", (u: User[]) => setUsers(u));
-
     socket.on("newChatMessage", (msg: Message) =>
       setMessages((prev) => [...prev, msg])
     );
-
     socket.on("chatHistory", (history: Message[]) =>
       setMessages(history || [])
     );
@@ -105,15 +123,16 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
 
   function handleEditorChange(value: string | undefined) {
     setCode(value || "");
-    socket.emit("codeChange", { roomId, code: value, language });
+    socketRef.current?.emit("codeChange", { roomId, code: value, language });
   }
   function handleLanguageChange(e: React.ChangeEvent<HTMLSelectElement>) {
     setLanguage(e.target.value);
+    socketRef.current?.emit("codeChange", { roomId, code, language: e.target.value });
   }
   function sendMessage(e: React.FormEvent) {
     e.preventDefault();
     if (!chatInput.trim() || !session?.user?.email) return;
-    socket.emit("chatMessage", {
+    socketRef.current?.emit("chatMessage", {
       roomId,
       sender: session.user.email,
       message: chatInput.trim(),
