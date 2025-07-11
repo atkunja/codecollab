@@ -1,10 +1,7 @@
 import type { NextRequest } from "next/server";
 
-export async function GET(
-  request: NextRequest,
-  context: { params: { id: string } }
-) {
-  const { id } = context.params;
+export async function GET(request: NextRequest, { params }) {
+  const { id } = params;
   const apiUrl = `http://localhost:3001/rooms/${id}`;
   try {
     const apiRes = await fetch(apiUrl, { method: "GET" });
@@ -19,11 +16,8 @@ export async function GET(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  context: { params: { id: string } }
-) {
-  const { id } = context.params;
+export async function DELETE(request: NextRequest, { params }) {
+  const { id } = params;
   const apiUrl = `http://localhost:3001/rooms/${id}`;
   const body = await request.text();
   try {
@@ -43,11 +37,8 @@ export async function DELETE(
   }
 }
 
-export async function POST(
-  request: NextRequest,
-  context: { params: { id: string } }
-) {
-  const { id } = context.params;
+export async function POST(request: NextRequest, { params }) {
+  const { id } = params;
   const apiUrl = `http://localhost:3001/rooms/${id}`;
   const body = await request.text();
   try {
@@ -66,4 +57,3 @@ export async function POST(
     );
   }
 }
-
