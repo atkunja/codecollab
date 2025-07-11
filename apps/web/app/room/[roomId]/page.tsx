@@ -3,7 +3,7 @@ import styles from "./room.module.css";
 
 import { use } from "react";
 import { useSession } from "next-auth/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import io from "socket.io-client";
 import dynamic from "next/dynamic";
 
@@ -28,7 +28,7 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
   const [roomInfo, setRoomInfo] = useState<{ name?: string; creator_email?: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
-  const editorRef = useRef<any>(null);
+  // const editorRef = useRef<any>(null); // <-- REMOVED, not used
 
   // Fetch room info from backend
   useEffect(() => {
@@ -59,14 +59,14 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
       setMessages([]);
       setUsers([]);
     });
-    socket.on("codeUpdate", (data: any) => {
+    socket.on("codeUpdate", (data: unknown) => {
       if (typeof data === "string") setCode(data);
-      else if (data?.code) setCode(data.code);
-      if (data?.language) setLanguage(data.language);
+      else if ((data as any)?.code) setCode((data as any).code);
+      if ((data as any)?.language) setLanguage((data as any).language);
     });
     socket.on("roomUsers", (u: User[]) => setUsers(u));
-    socket.on("newChatMessage", (msg: any) => setMessages((prev) => [...prev, msg]));
-    socket.on("chatHistory", (history: any[]) => setMessages(history || []));
+    socket.on("newChatMessage", (msg: { sender: string; message: string; created_at?: string }) => setMessages((prev) => [...prev, msg]));
+    socket.on("chatHistory", (history: { sender: string; message: string; created_at?: string }[]) => setMessages(history || []));
     return () => {
       socket.off("codeUpdate");
       socket.off("roomUsers");
