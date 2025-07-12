@@ -12,10 +12,8 @@
     "start": "turbo run start"
   },
   "packageManager": "pnpm@10.12.4",
-  "devDependencies": {
-    "turbo": "^2.5.4"
-  },
   "dependencies": {
+    "turbo": "^2.5.4",
     "next-auth": "^4.24.11",
     "socket.io-client": "^4.8.1"
   }
