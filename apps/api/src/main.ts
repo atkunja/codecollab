@@ -1,42 +1,32 @@
+// apps/api/src/main.ts
 import 'dotenv/config';
-import { NestFactory }    from '@nestjs/core';
-import { AppModule }      from './app.module';
-import type { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import cors from 'cors';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // ————————————————
-  // Parse your ALLOW_ORIGIN env
-  // ————————————————
+  // build your whitelist from env (comma-separated)
   const raw = process.env.ALLOW_ORIGIN || '';
-  console.log('🔑 ALLOW_ORIGIN raw:', raw);
-  const allowed = raw
+  const allowedOrigins = raw
     .split(',')
     .map(u => u.trim())
-    .filter(u => u.length > 0);
-  console.log('🛡️  Whitelist:', allowed);
+    .filter(u => !!u);
 
-  // —————————————————————————————————————
-  // Enable CORS with a typed callback
-  // —————————————————————————————————————
-  const corsOptions: CorsOptions = {
-    origin: (
-      incomingOrigin: string | undefined,
-      callback: (err: Error | null, allow?: boolean) => void
-    ) => {
-      console.log('↘️  Incoming Origin:', incomingOrigin);
-      if (!incomingOrigin || allowed.includes(incomingOrigin)) {
-        callback(null, true);
-      } else {
-        callback(new Error(`Origin ${incomingOrigin} not allowed by CORS`), false);
-      }
-    },
+  // always allow local dev
+  allowedOrigins.push('http://localhost:3002');
+
+  // register the cors middleware
+  app.use(cors({
+    origin: allowedOrigins,
     credentials: true,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  };
-  app.enableCors(corsOptions);
+    methods: ['GET','HEAD','PUT','PATCH','POST','DELETE'],
+  }));
 
-  await app.listen(process.env.PORT ?? 3001, '0.0.0.0');
+  const port = Number(process.env.PORT ?? 3001);
+  await app.listen(port, '0.0.0.0');
+  console.log(`🚀 API is listening on port ${port}`);
 }
+
 bootstrap();
