@@ -1,17 +1,17 @@
-// src/main.ts
 import 'dotenv/config';
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { NestFactory }  from '@nestjs/core';
+import { AppModule }    from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  
+  const allowed = process.env.ALLOW_ORIGIN
+    ? process.env.ALLOW_ORIGIN.split(',')
+    : [];
+
   app.enableCors({
-    // allow localhost dev plus any vercel.app domain
-    origin: [
-      'http://localhost:3002',
-      /\.vercel\.app$/,
-    ],
+    origin: allowed,
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   });
