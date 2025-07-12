@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Delete, Param, Get, Req } from '@nestjs/common';
+import { Controller, Post, Body, Delete, Param, Get } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { supabase } from './supabase';
 

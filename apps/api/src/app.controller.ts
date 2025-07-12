@@ -7,7 +7,6 @@ export class AppController {
 
   @Get()
   getHello(): any {
-    // Return a simple health check JSON
     return this.appService.getHello();
   }
 }
