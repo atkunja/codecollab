@@ -17,6 +17,8 @@
     "turbo": "^2.5.4"
   },
   "dependencies": {
+    "@supabase/auth-helpers-nextjs": "^0.10.0",
+    "@supabase/supabase-js": "^2.57.2",
     "next-auth": "^4.24.11",
     "socket.io-client": "^4.8.1"
   }
