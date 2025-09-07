@@ -1,31 +1,24 @@
-import 'dotenv/config';
+// apps/api/src/main.ts
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface'; // <-- add this
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { Request, Response, NextFunction } from 'express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // If you're using Express (default), keep the generic below:
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  const allowedOrigins = (process.env.ALLOW_ORIGIN || 'http://localhost:3000,https://codecollabak.vercel.app')
-    .split(',')
-    .map(origin => origin.trim());
+  // ✅ Type the middleware params so noImplicitAny is happy
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    // (keep whatever you had here—logging, headers, etc.)
+    next();
+  });
 
-  const corsOptions: CorsOptions = {
-    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error(`Origin ${origin} not allowed by CORS`));
-      }
-    },
-    credentials: true,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  };
-
-  app.enableCors(corsOptions);
-
-  const port = process.env.PORT || 3001;
+  const port = Number(process.env.PORT) || 3000;
   await app.listen(port, '0.0.0.0');
-  console.log(`🚀 API listening on http://0.0.0.0:${port}`);
+  // Optional: console.log so you can see it start up locally
+  // eslint-disable-next-line no-console
+  console.log(`API running on :${port}`);
 }
+
 bootstrap();
