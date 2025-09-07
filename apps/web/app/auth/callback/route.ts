@@ -1,10 +1,21 @@
-// apps/web/app/auth/callback/route.ts
-import { NextResponse } from "next/server";
+// apps/web/app/api/auth/[...nextauth]/route.ts
+import NextAuth, { NextAuthOptions } from "next-auth";
+import GitHubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
 
-export async function GET(req: Request) {
-  // After OAuth, Supabase sets the session cookie on your domain (via middleware + helper)
-  // We just forward users where they wanted to go.
-  const url = new URL(req.url);
-  const redirectTo = url.searchParams.get("redirectTo") ?? "/";
-  return NextResponse.redirect(new URL(redirectTo, url.origin));
-}
+export const authOptions: NextAuthOptions = {
+  secret: process.env.NEXTAUTH_SECRET,
+  providers: [
+    GitHubProvider({
+      clientId: process.env.GITHUB_CLIENT_ID ?? "",
+      clientSecret: process.env.GITHUB_CLIENT_SECRET ?? "",
+    }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID ?? "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
+    }),
+  ],
+};
+
+const handler = NextAuth(authOptions);
+export { handler as GET, handler as POST };
