@@ -1,7 +1,9 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  /* config options here */
+// apps/web/next.config.js
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  // ❌ Do NOT set `output: 'export'` if you use NextAuth/middleware/API routes.
+  // output: 'standalone' is OK, 'export' is NOT.
 };
 
-export default nextConfig;
+module.exports = nextConfig;
