@@ -2,6 +2,14 @@ import { Controller, Post, Body, Delete, Param, Get } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { supabase } from './supabase';
 
+const LANGUAGE_RUNNERS: Record<string, { language: string; extension: string }> = {
+  javascript: { language: 'javascript', extension: 'js' },
+  typescript: { language: 'typescript', extension: 'ts' },
+  python: { language: 'python', extension: 'py' },
+  cpp: { language: 'cpp', extension: 'cpp' },
+  java: { language: 'java', extension: 'java' },
+};
+
 @Controller('rooms')
 export class RoomController {
   @Post('create')
@@ -62,5 +70,65 @@ export class RoomController {
     await supabase.from('room_chat').delete().eq('room_id', id);
 
     return { success: true };
+  }
+
+  @Post(':id/execute')
+  async executeCode(
+    @Param('id') id: string,
+    @Body()
+    body: { code?: string; language?: string; stdin?: string },
+  ) {
+    if (!body?.code || !body?.language) {
+      return { error: 'Code and language are required.' };
+    }
+
+    const runtime = LANGUAGE_RUNNERS[body.language.toLowerCase()];
+    if (!runtime) {
+      return { error: `Unsupported language: ${body.language}` };
+    }
+
+    try {
+      const executorFetch = (globalThis as any).fetch;
+      if (!executorFetch) {
+        return { error: 'Execution service is unavailable.' };
+      }
+
+      const response = await executorFetch('https://emkc.org/api/v2/piston/execute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          language: runtime.language,
+          files: [
+            {
+              name: `main.${runtime.extension}`,
+              content: body.code,
+            },
+          ],
+          stdin: body.stdin ?? '',
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || result.error || result.message === 'error') {
+        return { error: result?.message || 'Execution failed.' };
+      }
+
+      const stdout = result.run?.stdout ?? result.run?.output ?? '';
+      const stderr =
+        (result.compile && result.compile.stderr) ||
+        result.run?.stderr ||
+        '';
+
+      return {
+        success: true,
+        language: body.language,
+        output: stdout,
+        stderr,
+      };
+    } catch (error) {
+      console.error('Code execution error', error);
+      return { error: 'Execution service is unavailable.' };
+    }
   }
 }

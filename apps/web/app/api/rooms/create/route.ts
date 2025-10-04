@@ -1,5 +1,12 @@
 export async function POST(req: Request) {
-  const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/rooms/create`;
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (!baseUrl) {
+    return new Response(
+      JSON.stringify({ error: "API URL not configured" }),
+      { status: 500 },
+    );
+  }
+  const apiUrl = `${baseUrl}/rooms/create`;
   const body = await req.text();
   try {
     const apiRes = await fetch(apiUrl, {

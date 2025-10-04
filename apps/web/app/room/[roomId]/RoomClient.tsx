@@ -9,9 +9,7 @@ import io from "socket.io-client";
 
 import styles from "./room.module.css";
 
-const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
-  ssr: false,
-});
+const MonacoEditor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 
 type User = { email: string; name?: string; image?: string };
 type Message = { sender: string; message: string; created_at?: string };
@@ -25,7 +23,7 @@ export default function RoomClient({ roomId }: RoomClientProps) {
 
   const socketRef = useRef<Socket | null>(null);
 
-  const [code, setCode] = useState("// Start coding!");
+  const [code, setCode] = useState("// Start coding!\n");
   const [users, setUsers] = useState<User[]>([]);
   const [language, setLanguage] = useState("javascript");
   const [messages, setMessages] = useState<Message[]>([]);
@@ -34,10 +32,14 @@ export default function RoomClient({ roomId }: RoomClientProps) {
   const [roomInfo, setRoomInfo] = useState<{ name?: string; creator_email?: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
+  const [stdin, setStdin] = useState("");
+  const [runOutput, setRunOutput] = useState("");
+  const [runError, setRunError] = useState<string | null>(null);
+  const [isRunning, setIsRunning] = useState(false);
 
   useEffect(() => {
-    const url = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") || "http://localhost:3001";
-    socketRef.current = io(url, { transports: ["websocket"] });
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") || "http://localhost:3001";
+    socketRef.current = io(baseUrl, { transports: ["websocket"] });
 
     return () => {
       if (socketRef.current) {
@@ -53,11 +55,15 @@ export default function RoomClient({ roomId }: RoomClientProps) {
     fetch(`/api/rooms/${roomId}`)
       .then(async (res) => {
         const data = await res.json();
-        if (data.error) setJoinError(data.error);
-        else setRoomInfo(data);
-        setLoading(false);
+        if (!res.ok || data.error) {
+          setJoinError(data.error || "Could not load room details.");
+          setRoomInfo(null);
+        } else {
+          setRoomInfo(data);
+        }
       })
-      .catch(() => setJoinError("Could not fetch room info."));
+      .catch(() => setJoinError("Could not fetch room info."))
+      .finally(() => setLoading(false));
   }, [roomId]);
 
   useEffect(() => {
@@ -79,8 +85,10 @@ export default function RoomClient({ roomId }: RoomClientProps) {
 
     socket.on("codeUpdate", (data: { code?: string; language?: string }) => {
       if (typeof data === "string") setCode(data);
-      else if (data?.code) setCode(data.code);
-      if (data?.language) setLanguage(data.language);
+      else {
+        if (data?.code) setCode(data.code);
+        if (data?.language) setLanguage(data.language);
+      }
     });
 
     socket.on("roomUsers", (u: User[]) => setUsers(u));
@@ -136,15 +144,50 @@ export default function RoomClient({ roomId }: RoomClientProps) {
     setChatInput("");
   }
 
+  async function handleRunCode() {
+    if (!code.trim()) {
+      setRunError("Add some code before running.");
+      setRunOutput("");
+      return;
+    }
+
+    setIsRunning(true);
+    setRunError(null);
+
+    try {
+      const res = await fetch(`/api/rooms/${roomId}/execute`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, language, stdin }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setRunError(data.error || "Code execution failed.");
+        setRunOutput("");
+        return;
+      }
+
+      setRunOutput(data.output || "");
+      setRunError(data.stderr ? data.stderr.trim() : null);
+    } catch (error) {
+      console.error("runCode error", error);
+      setRunError("Unable to reach the execution service.");
+      setRunOutput("");
+    } finally {
+      setIsRunning(false);
+    }
+  }
+
   if (status === "loading" || loading) {
-    return <div className={styles.container}>Loading...</div>;
+    return <div className={styles.page}>Loading…</div>;
   }
 
   if (status === "unauthenticated") {
     return (
-      <div className={styles.container}>
+      <div className={styles.page}>
         <div className={styles.loginPrompt}>
-          <h1 className={styles.header}>Room: {roomId}</h1>
+          <h1>Room: {roomId}</h1>
           <p className={styles.unauthText}>Please log in before using CodeCollab.</p>
           <Link href="/login" className={styles.loginButton}>
             Go to login
@@ -156,7 +199,7 @@ export default function RoomClient({ roomId }: RoomClientProps) {
 
   if (!session?.user?.email) {
     return (
-      <div className={styles.container}>
+      <div className={styles.page}>
         <div className={styles.loginPrompt}>
           <p className={styles.unauthText}>Please log in before using CodeCollab.</p>
           <Link href="/login" className={styles.loginButton}>
@@ -168,89 +211,145 @@ export default function RoomClient({ roomId }: RoomClientProps) {
   }
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.header}>
-        Room: <span>{roomId}</span>
-      </h1>
-      <p className={styles.userInfo}>Signed in as: {session.user.email}</p>
-      {joinError && <div className={styles.errorBanner}>Error: {joinError}</div>}
-      {roomInfo && (
-        <div className={styles.roomInfo}>
-          <b>Room Name:</b> {roomInfo.name || "—"}
-          <br />
-          <b>Created by:</b> {roomInfo.creator_email}
+    <div className={styles.page}>
+      <header className={styles.topBar}>
+        <div className={styles.roomMeta}>
+          <h1 className={styles.heading}>
+            Room: <span>{roomId}</span>
+          </h1>
+          <p className={styles.subHeading}>Signed in as {session.user.email}</p>
+          {roomInfo && (
+            <p className={styles.roomDetails}>
+              <span>{roomInfo.name || "Untitled room"}</span>
+              <span>Created by {roomInfo.creator_email}</span>
+            </p>
+          )}
         </div>
-      )}
-      {session.user.email && roomInfo?.creator_email === session.user.email && (
-        <button disabled={deleting} className={styles.deleteBtn} onClick={handleDeleteRoom}>
-          {deleting ? "Deleting..." : "Delete Room"}
-        </button>
-      )}
-      <b>Online Now:</b>
-      <ul className={styles.usersList}>
-        {users.map((u) => (
-          <li key={u.email} className={styles.userListItem}>
-            {u.image && (
-              <img
-                src={u.image}
-                alt={u.name || u.email}
-                width={32}
-                height={32}
-                className={styles.userAvatar}
-              />
-            )}
-            <span>{u.name || u.email}</span>
-          </li>
-        ))}
-      </ul>
-      <div className={styles.chatSection}>
-        <b>Room Chat</b>
-        <div className={styles.chatMessages}>
-          {messages.length === 0 && <span style={{ color: "#aaa" }}>No messages yet</span>}
-          {messages.map((m, i) => (
-            <div key={i}>
-              <b style={{ color: "#4fd1c5" }}>{m.sender}:</b> {m.message}
-              {m.created_at && (
-                <span style={{ color: "#888", fontSize: 12, marginLeft: 8 }}>
-                  {new Date(m.created_at).toLocaleTimeString()}
-                </span>
-              )}
-            </div>
-          ))}
-        </div>
-        <form onSubmit={sendMessage} className={styles.inputForm}>
-          <input
-            type="text"
-            placeholder="Type a message..."
-            value={chatInput}
-            onChange={(e) => setChatInput(e.target.value)}
-            className={styles.inputMessage}
-            disabled={!!joinError}
-          />
-          <button type="submit" className={styles.sendBtn} disabled={!!joinError}>
-            Send
+        {session.user.email && roomInfo?.creator_email === session.user.email && (
+          <button
+            type="button"
+            onClick={handleDeleteRoom}
+            disabled={deleting}
+            className={styles.deleteBtn}
+          >
+            {deleting ? "Deleting…" : "Delete room"}
           </button>
-        </form>
+        )}
+      </header>
+
+      {joinError && <div className={styles.errorBanner}>Error: {joinError}</div>}
+
+      <div className={styles.workspace}>
+        <section className={styles.editorColumn}>
+          <div className={styles.toolbar}>
+            <label className={styles.fieldLabel}>
+              Language
+              <select value={language} onChange={handleLanguageChange} className={styles.selectLang}>
+                <option value="javascript">JavaScript</option>
+                <option value="typescript">TypeScript</option>
+                <option value="python">Python</option>
+                <option value="cpp">C++</option>
+                <option value="java">Java</option>
+              </select>
+            </label>
+            <div className={styles.runActions}>
+              <textarea
+                className={styles.stdinInput}
+                placeholder="Optional input (stdin)"
+                value={stdin}
+                onChange={(e) => setStdin(e.target.value)}
+                rows={1}
+              />
+              <button
+                type="button"
+                onClick={handleRunCode}
+                className={styles.runButton}
+                disabled={isRunning}
+              >
+                {isRunning ? "Running…" : "Run code"}
+              </button>
+            </div>
+          </div>
+
+          <div className={styles.editorShell}>
+            <MonacoEditor
+              height="58vh"
+              defaultLanguage={language}
+              language={language}
+              value={code}
+              onChange={handleEditorChange}
+              theme="vs-dark"
+              options={{
+                fontSize: 16,
+                minimap: { enabled: false },
+              }}
+            />
+          </div>
+
+          <div className={styles.outputCard}>
+            <h2>Program output</h2>
+            {runError && <p className={styles.outputError}>{runError}</p>}
+            <pre className={styles.outputPane}>{runOutput || ""}</pre>
+          </div>
+        </section>
+
+        <aside className={styles.sidebar}>
+          <div className={styles.card}>
+            <h2>Participants</h2>
+            <ul className={styles.usersList}>
+              {users.length === 0 && <li className={styles.emptyState}>No one else is here yet.</li>}
+              {users.map((u) => (
+                <li key={u.email} className={styles.userListItem}>
+                  {u.image && (
+                    <img
+                      src={u.image}
+                      alt={u.name || u.email}
+                      width={36}
+                      height={36}
+                      className={styles.userAvatar}
+                    />
+                  )}
+                  <div>
+                    <span className={styles.userName}>{u.name || u.email}</span>
+                    {u.name && <span className={styles.userEmail}>{u.email}</span>}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className={styles.card}>
+            <h2>Room chat</h2>
+            <div className={styles.chatMessages}>
+              {messages.length === 0 && <span className={styles.emptyState}>No messages yet</span>}
+              {messages.map((m, i) => (
+                <div key={i} className={styles.chatMessage}>
+                  <span className={styles.chatAuthor}>{m.sender}</span>
+                  <span className={styles.chatBody}>{m.message}</span>
+                  {m.created_at && (
+                    <span className={styles.chatTimestamp}>
+                      {new Date(m.created_at).toLocaleTimeString()}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+            <form onSubmit={sendMessage} className={styles.chatForm}>
+              <input
+                type="text"
+                placeholder="Type a message…"
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                className={styles.chatInput}
+                disabled={!!joinError}
+              />
+              <button type="submit" className={styles.sendBtn} disabled={!!joinError}>
+                Send
+              </button>
+            </form>
+          </div>
+        </aside>
       </div>
-      <select value={language} onChange={handleLanguageChange} className={styles.selectLang}>
-        <option value="javascript">JavaScript</option>
-        <option value="typescript">TypeScript</option>
-        <option value="python">Python</option>
-        <option value="cpp">C++</option>
-        <option value="java">Java</option>
-      </select>
-      <MonacoEditor
-        height="60vh"
-        defaultLanguage={language}
-        language={language}
-        value={code}
-        onChange={handleEditorChange}
-        theme="vs-dark"
-        options={{
-          fontSize: 16,
-          minimap: { enabled: false },
-        }}
-      />
     </div>
   );
 }

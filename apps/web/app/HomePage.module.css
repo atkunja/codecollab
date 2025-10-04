@@ -1,198 +1,218 @@
 .container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #17192d 0%, #202442 100%);
+  background: radial-gradient(circle at 15% 15%, rgba(103, 230, 220, 0.18), transparent 45%),
+    radial-gradient(circle at 85% 10%, rgba(91, 110, 225, 0.22), transparent 48%),
+    linear-gradient(135deg, #0b0c14 0%, #121421 50%, #090a14 100%);
   color: #f5f6fa;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding-bottom: 60px;
-  position: relative;
+  padding: clamp(32px, 6vw, 60px);
+  gap: clamp(48px, 7vw, 72px);
+  font-family: "Inter", "Segoe UI", sans-serif;
 }
 
 .navbar {
-  position: absolute;
-  top: 25px;
-  left: 32px;
+  width: min(1120px, 100%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.brand {
   display: flex;
   align-items: center;
-  gap: 12px;
-  z-index: 10;
+  gap: 14px;
+  font-weight: 600;
+  color: #a5b8e9;
+}
+
+.brandLogo {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(103, 230, 220, 0.5), rgba(91, 110, 225, 0.5));
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: #041019;
+}
+
+.signInButton,
+.signOutButton {
+  border: none;
+  border-radius: 12px;
+  padding: 10px 22px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
 .signInButton {
-  background: #4285F4;
-  color: #fff;
-  border: none;
-  font-weight: 600;
-  border-radius: 7px;
-  padding: 7px 16px;
-  transition: background 0.2s;
-  cursor: pointer;
+  background: linear-gradient(135deg, #67e6dc 0%, #5b6ee1 100%);
+  color: #041019;
+  box-shadow: 0 14px 30px rgba(91, 110, 225, 0.35);
 }
 
-.signInButton:hover { background: #357ae8; }
-
-.signedBox {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.signedText {
-  font-size: 14px;
-  color: #eee;
-}
 .signOutButton {
-  background: #ef4444;
-  color: #fff;
-  border: none;
-  border-radius: 7px;
-  padding: 7px 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
+  background: rgba(245, 71, 71, 0.15);
+  color: #ff9b9b;
+  border: 1px solid rgba(245, 71, 71, 0.35);
 }
-.signOutButton:hover { background: #b91c1c; }
 
-.logoContainer {
-  margin-bottom: 12px;
+.signInButton:hover,
+.signOutButton:hover {
+  transform: translateY(-1px);
 }
-.logo {
-  width: 110px;
-  height: 110px;
-  border-radius: 50%;
-  box-shadow: 0 2px 18px 0 #3fe6e6a9;
-  display: block;
-  margin: 0 auto;
-  background: #111425;
+
+.hero {
+  width: min(1120px, 100%);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: clamp(32px, 6vw, 64px);
+  align-items: center;
+}
+
+.headline {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
 .title {
-  font-size: 2.8rem;
-  font-weight: 900;
-  letter-spacing: 1px;
-  margin-bottom: 6px;
-  color: #44e7db;
-  text-align: center;
+  font-size: clamp(2.4rem, 4vw, 3.4rem);
+  font-weight: 800;
+  color: #f5f6fa;
+  letter-spacing: -0.02em;
 }
+
+.title span {
+  color: #67e6dc;
+}
+
 .subtitle {
-  font-size: 1.08rem;
-  color: #a5b6de;
-  margin-bottom: 36px;
-  text-align: center;
+  font-size: clamp(1.05rem, 1.6vw, 1.2rem);
+  color: #a5b8e9;
+  line-height: 1.7;
+  max-width: 520px;
+}
+
+.heroCard {
+  background: rgba(10, 12, 22, 0.92);
+  border-radius: 24px;
+  padding: clamp(24px, 4vw, 32px);
+  border: 1px solid rgba(103, 230, 220, 0.12);
+  box-shadow: 0 24px 56px rgba(6, 9, 18, 0.55);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.logoContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.logo {
+  width: clamp(96px, 12vw, 120px);
+  height: clamp(96px, 12vw, 120px);
+  border-radius: 32px;
+  background: radial-gradient(circle at 30% 30%, #171d2c, #0b0c14);
+  display: block;
+  box-shadow: 0 26px 60px rgba(103, 230, 220, 0.25);
 }
 
 .formRow {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 18px;
-  margin: 18px 0 30px 0;
-  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
 }
+
 .form {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 0;
-  background: #22243b;
-  border-radius: 12px;
-  box-shadow: 0 3px 16px 0 #111425a3;
+  background: rgba(12, 15, 24, 0.9);
+  border: 1px solid rgba(103, 230, 220, 0.08);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(91, 110, 225, 0.08);
 }
 
 .input {
+  flex: 1;
   border: none;
-  border-radius: 12px 0 0 12px;
-  background: #232334;
+  padding: 16px 18px;
+  background: transparent;
   color: #f5f6fa;
   font-size: 1rem;
-  padding: 14px 14px;
-  min-width: 190px;
-  max-width: 220px;
-  outline: none;
-  transition: background 0.2s;
 }
-.input:focus { background: #24274a; }
 
 .joinButton {
   border: none;
-  border-radius: 0 12px 12px 0;
-  background: linear-gradient(90deg, #4fd1c5, #5b6ee1);
-  color: #17212b;
+  background: linear-gradient(135deg, #67e6dc 0%, #5b6ee1 100%);
+  color: #041019;
+  padding: 16px 26px;
   font-weight: 700;
-  padding: 14px 30px;
-  font-size: 1.08rem;
   cursor: pointer;
-  transition: filter 0.14s, opacity 0.12s;
-  box-shadow: 0 1px 7px 0 #0d1021a2;
 }
-.joinButton:active { filter: brightness(0.94); }
-.joinButton:hover { opacity: 0.91; }
 
-.createLink {
-  margin-left: 0px;
-}
 .createButton {
+  width: 100%;
   border: none;
-  border-radius: 12px;
-  background: linear-gradient(90deg, #54e6c1, #76a7fa 90%);
-  color: #17212b;
-  font-weight: 700;
-  padding: 14px 32px;
-  font-size: 1.08rem;
+  border-radius: 16px;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, rgba(103, 230, 220, 0.2), rgba(91, 110, 225, 0.2));
+  color: #cde1ff;
+  font-weight: 600;
+  border: 1px solid rgba(103, 230, 220, 0.18);
   cursor: pointer;
-  transition: filter 0.14s, opacity 0.12s;
-  box-shadow: 0 1px 7px 0 #0d1021a2;
 }
-.createButton:active { filter: brightness(0.93); }
-.createButton:hover { opacity: 0.90; }
-
-.tip {
-  color: #44e7db;
-  margin-top: 32px;
-  text-align: center;
-  font-size: 1.03rem;
-}
-.tip b { color: #44e7db; }
 
 .notice {
-  margin-top: 12px;
-  padding: 12px 20px;
-  border-radius: 10px;
-  background: rgba(23, 25, 45, 0.85);
-  color: #f5f6fa;
+  padding: 16px 18px;
+  background: rgba(245, 71, 71, 0.12);
+  border-radius: 16px;
+  border: 1px solid rgba(245, 71, 71, 0.23);
+  color: #ff9b9b;
   font-weight: 600;
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+}
+
+.tip {
   text-align: center;
-  max-width: 360px;
+  color: #cde1ff;
+  font-size: 1rem;
 }
 
 .footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100vw;
-  background: #191a2bdb;
-  text-align: center;
-  font-size: 1rem;
-  padding: 10px 0 7px 0;
-  border-top: 1px solid #232334;
-  color: #b2c8e8;
+  width: min(1120px, 100%);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  color: #8da0cc;
+  font-size: 0.95rem;
 }
+
 .email {
-  color: #44e7db;
-  text-decoration: underline;
+  color: #67e6dc;
 }
-@media (max-width: 700px) {
-  .formRow {
+
+@media (max-width: 720px) {
+  .navbar {
     flex-direction: column;
-    gap: 15px;
+    gap: 16px;
   }
-  .input, .joinButton, .createButton {
-    font-size: 0.98rem;
-    padding: 12px 10px;
-    min-width: 130px;
+
+  .brand {
+    width: 100%;
+    justify-content: center;
   }
-  .footer { font-size: 0.93rem; }
-  .logo { width: 84px; height: 84px; }
+
+  .heroCard {
+    order: -1;
+  }
+
+  .footer {
+    justify-content: center;
+    text-align: center;
+  }
 }

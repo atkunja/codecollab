@@ -44,60 +44,62 @@ export default function HomePage() {
 
   return (
     <main className={styles.container}>
-      {/* Navbar for auth */}
       <nav className={styles.navbar}>
+        <div className={styles.brand}>
+          <div className={styles.brandLogo}>CC</div>
+          <span>CodeCollab</span>
+        </div>
         {!session ? (
           <button onClick={() => signIn("google")} className={styles.signInButton}>
             Sign in with Google
           </button>
         ) : (
-          <div className={styles.signedBox}>
-            <span className={styles.signedText}>Signed in as: {session.user?.email}</span>
-            <button onClick={() => signOut()} className={styles.signOutButton}>
-              Sign out
-            </button>
-          </div>
+          <button onClick={() => signOut()} className={styles.signOutButton}>
+            Sign out ({session.user?.email})
+          </button>
         )}
       </nav>
 
-      {/* Logo and Title */}
-      <div className={styles.logoContainer}>
-        <img src="/codecollab-logo.png" alt="CodeCollab Logo" className={styles.logo} />
-      </div>
-      <h1 className={styles.title}>CodeCollab</h1>
-      <div className={styles.subtitle}>
-        Instantly create or join collaborative coding rooms
-      </div>
-
-      {/* Form Row */}
-      <div className={styles.formRow}>
-        <form onSubmit={handleJoin} className={styles.form}>
-          <input
-            value={roomInput}
-            onChange={(e) => setRoomInput(e.target.value)}
-            placeholder="Room code"
-            className={styles.input}
-            maxLength={24}
-          />
-          <button type="submit" className={styles.joinButton}>
-            Join Room
-          </button>
-        </form>
-        <div className={styles.createLink}>
-          <button type="button" className={styles.createButton} onClick={handleCreate}>
-            Create Room
-          </button>
+      <section className={styles.hero}>
+        <div className={styles.headline}>
+          <h1 className={styles.title}>
+            Build together in <span>real-time</span>
+          </h1>
+          <p className={styles.subtitle}>
+            Create shareable coding rooms, chat with your team, and run code for the most popular languages—all without leaving your browser.
+          </p>
+          {message && <div className={styles.notice}>{message}</div>}
+          <p className={styles.tip}>
+            Tip: Share your room code to collaborate instantly.
+          </p>
         </div>
-      </div>
 
-      {message && <div className={styles.notice}>{message}</div>}
-
-      <p className={styles.tip}>
-        <b>Tip:</b> Share your room code to collaborate instantly.
-      </p>
+        <div className={styles.heroCard}>
+          <div className={styles.logoContainer}>
+            <img src="/codecollab-logo.png" alt="CodeCollab Logo" className={styles.logo} />
+          </div>
+          <div className={styles.formRow}>
+            <form onSubmit={handleJoin} className={styles.form}>
+              <input
+                value={roomInput}
+                onChange={(e) => setRoomInput(e.target.value)}
+                placeholder="Enter a room code"
+                className={styles.input}
+                maxLength={24}
+              />
+              <button type="submit" className={styles.joinButton}>
+                Join room
+              </button>
+            </form>
+            <button type="button" className={styles.createButton} onClick={handleCreate}>
+              Create a new room
+            </button>
+          </div>
+        </div>
+      </section>
 
       <footer className={styles.footer}>
-        Created by Ayush Kunjadia — Contact:{" "}
+        <span>Created by Ayush Kunjadia</span>
         <a href="mailto:atkunjadia@gmail.com" className={styles.email}>
           atkunjadia@gmail.com
         </a>

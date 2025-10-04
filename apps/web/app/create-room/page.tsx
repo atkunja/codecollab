@@ -23,27 +23,27 @@ export default function CreateRoomPage() {
       setMessage("Room name required.");
       return;
     }
-    // Use only env variable for cloud, or fallback ONLY in local dev!
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-    if (!apiUrl) {
-      setMessage("API URL is not configured. (Contact admin)");
-      return;
-    }
-    const res = await fetch(`${apiUrl}/rooms/create`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name,
-        id: roomId || undefined,
-        creatorEmail: session.user.email,
-      }),
-    });
-    const data = await res.json();
-    if (data.success) {
-      setMessage("Room created!");
-      router.push(`/room/${data.id}`);
-    } else {
-      setMessage(data.error || "Failed to create room.");
+    setMessage("");
+    try {
+      const res = await fetch("/api/rooms/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          id: roomId || undefined,
+          creatorEmail: session.user.email,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setMessage("Room created!");
+        router.push(`/room/${data.id}`);
+      } else {
+        setMessage(data.error || "Failed to create room.");
+      }
+    } catch (error) {
+      console.error("Failed to create room", error);
+      setMessage("Unable to reach the server. Please try again.");
     }
   }
 
@@ -55,7 +55,7 @@ export default function CreateRoomPage() {
     return (
       <div className={styles.container}>
         <div className={styles.authGuard}>
-          <div className={styles.title}>Create Room</div>
+          <h1 className={styles.title}>Create a room</h1>
           <p className={styles.guardText}>Please log in before using CodeCollab.</p>
           <Link href="/login" className={styles.guardButton}>
             Go to login
@@ -67,43 +67,37 @@ export default function CreateRoomPage() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.title}>Create Room</div>
-      <form className={styles.form} onSubmit={handleCreate}>
-        <input
-          className={styles.input}
-          placeholder="Room name"
-          value={name}
-          onChange={e => setName(e.target.value)}
-          maxLength={32}
-          required
-        />
-        <input
-          className={styles.input}
-          placeholder="Room code (optional)"
-          value={roomId}
-          onChange={e => setRoomId(e.target.value)}
-          maxLength={32}
-        />
-        <button type="submit" className={styles.button}>
-          Create Room
-        </button>
-      </form>
-      {message && (
-        <div
-          className={
-            styles.message +
-            " " +
-            (message.startsWith("Room created") ? styles.success : styles.error)
-          }
-        >
-          {message}
+      <div className={styles.card}>
+        <h1 className={styles.title}>Create a room</h1>
+        <p className={styles.subtitle}>Name your space, optionally add a custom code, and start collaborating instantly.</p>
+        <form className={styles.form} onSubmit={handleCreate}>
+          <input
+            className={styles.input}
+            placeholder="Room name"
+            value={name}
+            onChange={e => setName(e.target.value)}
+            maxLength={32}
+            required
+          />
+          <input
+            className={styles.input}
+            placeholder="Room code (optional)"
+            value={roomId}
+            onChange={e => setRoomId(e.target.value)}
+            maxLength={32}
+          />
+          <button type="submit" className={styles.button}>
+            Create room
+          </button>
+        </form>
+        {message && (
+          <div className={`${styles.message} ${message.startsWith("Room created") ? styles.success : styles.error}`}>
+            {message}
+          </div>
+        )}
+        <div className={styles.footer}>
+          Created by Ayush Kunjadia — <a href="mailto:atkunjadia@gmail.com">atkunjadia@gmail.com</a>
         </div>
-      )}
-      <div className={styles.footer}>
-        <b>Created by Ayush Kunjadia</b> —{" "}
-        <a href="mailto:atkunjadia@gmail.com" style={{ color: "#4fd1c5", textDecoration: "underline" }}>
-          atkunjadia@gmail.com
-        </a>
       </div>
     </div>
   );
