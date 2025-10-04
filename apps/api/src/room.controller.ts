@@ -1,6 +1,7 @@
 import { Controller, Post, Body, Delete, Param, Get } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { supabase } from './supabase';
+import { request as httpsRequest } from 'node:https';
 
 const LANGUAGE_RUNNERS: Record<string, { language: string; extension: string }> = {
   javascript: { language: 'javascript', extension: 'js' },
@@ -88,36 +89,64 @@ export class RoomController {
     }
 
     try {
-      const executorFetch = (globalThis as any).fetch;
-      if (!executorFetch) {
-        return { error: 'Execution service is unavailable.' };
-      }
-
-      const response = await executorFetch('https://emkc.org/api/v2/piston/execute', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          language: runtime.language,
-          files: [
-            {
-              name: `main.${runtime.extension}`,
-              content: body.code,
-            },
-          ],
-          stdin: body.stdin ?? '',
-        }),
+      const payload = JSON.stringify({
+        language: runtime.language,
+        files: [
+          {
+            name: `main.${runtime.extension}`,
+            content: body.code,
+          },
+        ],
+        stdin: body.stdin ?? '',
       });
 
-      const result = await response.json();
+      const result = await new Promise<{ statusCode: number; data: string }>((resolve, reject) => {
+        const req = httpsRequest(
+          {
+            hostname: 'emkc.org',
+            path: '/api/v2/piston/execute',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': Buffer.byteLength(payload),
+            },
+            timeout: 10_000,
+          },
+          (response) => {
+            let body = '';
+            response.setEncoding('utf8');
+            response.on('data', (chunk) => {
+              body += chunk;
+            });
+            response.on('end', () => {
+              resolve({ statusCode: response.statusCode ?? 500, data: body });
+            });
+          },
+        );
 
-      if (!response.ok || result.error || result.message === 'error') {
-        return { error: result?.message || 'Execution failed.' };
+        req.on('error', (err) => reject(err));
+        req.on('timeout', () => {
+          req.destroy();
+          reject(new Error('Execution timed out'));
+        });
+        req.write(payload);
+        req.end();
+      });
+
+      const parsed = JSON.parse(result.data || '{}');
+
+      if (result.statusCode < 200 || result.statusCode >= 300) {
+        return { error: parsed?.message || 'Execution failed.' };
       }
 
-      const stdout = result.run?.stdout ?? result.run?.output ?? '';
+      if (parsed.error || parsed.message === 'error') {
+        return { error: parsed?.message || 'Execution failed.' };
+      }
+
+      const stdout = parsed.run?.stdout ?? parsed.run?.output ?? '';
       const stderr =
-        (result.compile && result.compile.stderr) ||
-        result.run?.stderr ||
+        (parsed.compile && parsed.compile.stderr) ||
+        parsed.run?.stderr ||
         '';
 
       return {
