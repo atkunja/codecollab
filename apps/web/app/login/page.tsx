@@ -12,23 +12,10 @@ export default function LoginPage() {
         <p className={styles.subtitle}>
           Choose a provider to continue. You will return to your previous page right after authentication.
         </p>
-        <div>
-          <button
-            onClick={() => signIn("github")}
-            className={`${styles.button} ${styles.buttonGithub}`}
-          >
-            Continue with GitHub
-          </button>
-        </div>
-        <div>
-          <button
-            onClick={() => signIn("google")}
-            className={`${styles.button} ${styles.buttonGoogle}`}
-          >
-            Continue with Google
-          </button>
-        </div>
-        <p className={styles.footer}>Secure OAuth handled by NextAuth.</p>
+        <button onClick={() => signIn("google")} className={styles.button}>
+          Continue with Google
+        </button>
+        <p className={styles.footer}>Secure sign-in handled by NextAuth.</p>
       </div>
     </main>
   );

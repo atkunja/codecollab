@@ -204,10 +204,6 @@ export default function HomePage() {
               <button type="button" className={styles.joinButton} onClick={handleCreate}>
                 Create a room now
               </button>
-              <button type="button" className={styles.secondaryButton} onClick={() => router.push("/login")}
-              >
-                Review authentication options
-              </button>
             </div>
           </div>
         </section>

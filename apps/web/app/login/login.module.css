@@ -42,15 +42,6 @@
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.12s ease, box-shadow 0.12s ease;
-}
-
-.buttonGithub {
-  background: linear-gradient(135deg, rgba(103, 230, 220, 0.18), rgba(91, 110, 225, 0.24));
-  color: #f5f6fa;
-  border: 1px solid rgba(103, 230, 220, 0.22);
-}
-
-.buttonGoogle {
   background: linear-gradient(135deg, #67e6dc 0%, #5b6ee1 100%);
   color: #051322;
 }

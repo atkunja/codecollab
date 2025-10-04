@@ -300,16 +300,6 @@
   gap: 16px;
 }
 
-.secondaryButton {
-  border-radius: 16px;
-  border: 1px solid rgba(103, 230, 220, 0.32);
-  background: transparent;
-  color: #d3e4ff;
-  padding: 14px 20px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
 .footer {
   display: flex;
   flex-direction: column;
