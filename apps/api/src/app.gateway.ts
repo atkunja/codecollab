@@ -100,6 +100,7 @@ export class AppGateway
   async handleCodeChange(
     @MessageBody()
     payload: { roomId: string; code: string; language?: string; editedBy?: string; editedAt?: string },
+    @ConnectedSocket() client: Socket,
   ) {
     await supabase.from('room_code').upsert([
       {
@@ -109,7 +110,7 @@ export class AppGateway
       },
     ]);
 
-    this.server.to(payload.roomId).emit('codeUpdate', {
+    client.broadcast.to(payload.roomId).emit('codeUpdate', {
       code: payload.code,
       language: payload.language || 'javascript',
       editedBy: payload.editedBy,
