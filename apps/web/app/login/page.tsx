@@ -2,29 +2,33 @@
 "use client";
 
 import { signIn } from "next-auth/react";
+import styles from "./login.module.css";
 
 export default function LoginPage() {
   return (
-    <main className="min-h-screen grid place-items-center">
-      <div className="w-full max-w-sm rounded-2xl border p-6 shadow-sm">
-        <h1 className="text-xl font-semibold">Sign in</h1>
-        <p className="mt-2 text-sm text-slate-600">
-          Choose a provider to continue.
+    <main className={styles.container}>
+      <div className={styles.card}>
+        <h1 className={styles.title}>Sign in to CodeCollab</h1>
+        <p className={styles.subtitle}>
+          Choose a provider to continue. You will return to your previous page right after authentication.
         </p>
-        <div className="mt-6 space-y-3">
+        <div>
           <button
             onClick={() => signIn("github")}
-            className="w-full rounded-xl border px-4 py-2"
+            className={`${styles.button} ${styles.buttonGithub}`}
           >
             Continue with GitHub
           </button>
+        </div>
+        <div>
           <button
             onClick={() => signIn("google")}
-            className="w-full rounded-xl border px-4 py-2"
+            className={`${styles.button} ${styles.buttonGoogle}`}
           >
             Continue with Google
           </button>
         </div>
+        <p className={styles.footer}>Secure OAuth handled by NextAuth.</p>
       </div>
     </main>
   );

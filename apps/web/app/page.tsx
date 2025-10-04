@@ -14,19 +14,19 @@ export default function HomePage() {
   const features = [
     {
       title: "Live collaboration",
-      body: "Sync code edits, language changes, and cursor presence instantly across everyone in the room.",
+      body: "Sync code edits, language changes, and presence instantly across everyone in the room.",
     },
     {
       title: "In-room chat",
-      body: "Keep discussions close to the code with a lightweight chat that stores the latest history for each room.",
+      body: "Keep discussions close to the code with a lightweight chat that remembers your latest history.",
     },
     {
       title: "Secure access",
-      body: "NextAuth handles sign-in with Google or GitHub while Supabase stores room metadata securely.",
+      body: "Sign in with Google or GitHub while keeping rooms private to invited collaborators.",
     },
     {
       title: "One-click execution",
-      body: "Run JavaScript, TypeScript, Python, C++, or Java in the cloud without setting up toolchains locally.",
+      body: "Run JavaScript, TypeScript, Python, C++, or Java in the cloud without installing tooling.",
     },
   ];
 
@@ -167,28 +167,28 @@ export default function HomePage() {
 
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionHeading}>Under the hood</h2>
+            <h2 className={styles.sectionHeading}>Built for every collaboration style</h2>
             <p className={styles.sectionBody}>
-              CodeCollab is powered by a modern edge-first stack. That means blazing-fast load times, secure authentication, and realtime updates you can trust.
+              CodeCollab adapts to your workflow, whether you are coaching, interviewing, or shipping features with a distributed squad.
             </p>
           </div>
           <div className={styles.splitSection}>
             <div>
-              <h3 className={styles.featureTitle}>Platform highlights</h3>
+              <h3 className={styles.featureTitle}>Room essentials</h3>
               <ul className={styles.bulletList}>
-                <li>Next.js App Router with streaming rendering and edge middleware</li>
-                <li>NestJS API on Railway with Socket.IO for realtime collaboration</li>
-                <li>Supabase storage for persistent room data and activity logs</li>
-                <li>Piston-powered execution sandbox for five popular languages</li>
+                <li>Persistent rooms so you can pause and resume whenever you need</li>
+                <li>Granular room deletion controls for the creator</li>
+                <li>Dedicated execution output with support for custom stdin</li>
+                <li>Beautiful, distraction-free editing powered by Monaco</li>
               </ul>
             </div>
             <div>
-              <h3 className={styles.featureTitle}>Perfect for</h3>
+              <h3 className={styles.featureTitle}>Popular use cases</h3>
               <ul className={styles.bulletList}>
-                <li>Pair programming sessions and remote mob reviews</li>
-                <li>Live coding interviews without environment friction</li>
-                <li>Workshops, classrooms, and quick prototyping</li>
-                <li>Hackathons where speed and alignment matter most</li>
+                <li>Pair programming sessions and lunchtime code reviews</li>
+                <li>Live coding interviews without share-screen hurdles</li>
+                <li>Student labs, mentorship cohorts, and study groups</li>
+                <li>Hackathons where rapid iteration and sharing matter</li>
               </ul>
             </div>
           </div>
@@ -220,7 +220,7 @@ export default function HomePage() {
           <a href="https://www.linkedin.com/in/ayushkunjadia/" target="_blank" rel="noreferrer">
             LinkedIn
           </a>
-          <a href="https://github.com/ayushkunjadia" target="_blank" rel="noreferrer">
+          <a href="https://github.com/atkunja" target="_blank" rel="noreferrer">
             GitHub
           </a>
         </div>

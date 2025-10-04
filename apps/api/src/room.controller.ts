@@ -91,6 +91,7 @@ export class RoomController {
     try {
       const payload = JSON.stringify({
         language: runtime.language,
+        version: '*',
         files: [
           {
             name: `main.${runtime.extension}`,

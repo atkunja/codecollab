@@ -36,6 +36,7 @@ export default function RoomClient({ roomId }: RoomClientProps) {
   const [runOutput, setRunOutput] = useState("");
   const [runError, setRunError] = useState<string | null>(null);
   const [isRunning, setIsRunning] = useState(false);
+  const [lastRun, setLastRun] = useState<string | null>(null);
 
   useEffect(() => {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") || "http://localhost:3001";
@@ -153,6 +154,7 @@ export default function RoomClient({ roomId }: RoomClientProps) {
 
     setIsRunning(true);
     setRunError(null);
+    setLastRun(null);
 
     try {
       const res = await fetch(`/api/rooms/${roomId}/execute`, {
@@ -162,14 +164,16 @@ export default function RoomClient({ roomId }: RoomClientProps) {
       });
       const data = await res.json();
 
-      if (!res.ok) {
+      if (!res.ok || !data.success) {
         setRunError(data.error || "Code execution failed.");
-        setRunOutput("");
+        setRunOutput(data.output || "");
         return;
       }
 
-      setRunOutput(data.output || "");
+      const output = typeof data.output === "string" ? data.output.trim() : "";
+      setRunOutput(output || "Program finished with no output.");
       setRunError(data.stderr ? data.stderr.trim() : null);
+      setLastRun(new Date().toLocaleTimeString());
     } catch (error) {
       console.error("runCode error", error);
       setRunError("Unable to reach the execution service.");
@@ -287,9 +291,12 @@ export default function RoomClient({ roomId }: RoomClientProps) {
           </div>
 
           <div className={styles.outputCard}>
-            <h2>Program output</h2>
+            <div className={styles.outputHeading}>
+              <h2>Program output</h2>
+              {lastRun && <span className={styles.outputTimestamp}>Last run {lastRun}</span>}
+            </div>
             {runError && <p className={styles.outputError}>{runError}</p>}
-            <pre className={styles.outputPane}>{runOutput || ""}</pre>
+            <pre className={styles.outputPane}>{runOutput}</pre>
           </div>
         </section>
 

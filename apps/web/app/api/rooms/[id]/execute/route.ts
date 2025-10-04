@@ -4,12 +4,11 @@ type RouteContext = {
 
 export async function POST(req: Request, context: RouteContext) {
   const { id } = await context.params;
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-  if (!baseUrl) {
-    return new Response(JSON.stringify({ error: "API URL not configured" }), {
-      status: 500,
-    });
-  }
+  const baseUrl =
+    process.env.NEXT_PUBLIC_API_URL ||
+    process.env.API_URL ||
+    process.env.INTERNAL_API_URL ||
+    "http://localhost:3001";
 
   const body = await req.text();
 
