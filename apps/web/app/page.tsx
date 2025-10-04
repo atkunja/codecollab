@@ -4,12 +4,17 @@ import { useEffect, useState } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import styles from "./HomePage.module.css";
+import { HomeJoinNotice } from "./HomeJoinNotice";
 
 export default function HomePage() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const [roomInput, setRoomInput] = useState("");
   const [message, setMessage] = useState<string | null>(null);
+  const [joinFeedback, setJoinFeedback] = useState<
+    { tone: "info" | "success" | "error"; message: string }
+  | null
+  >(null);
 
   const features = [
     {
@@ -57,7 +62,7 @@ export default function HomePage() {
     }
   }, [status]);
 
-  function requireAuth(action: () => void) {
+  function requireAuth(action: () => void | Promise<void>) {
     if (status !== "authenticated") {
       setMessage("Please log in before using CodeCollab.");
       return;
@@ -71,17 +76,25 @@ export default function HomePage() {
     if (!trimmed) return;
 
     requireAuth(async () => {
+      setJoinFeedback({ tone: "info", message: "Checking room…" });
       try {
         const res = await fetch(`/api/rooms/${trimmed}`);
         const data = await res.json();
         if (!res.ok || data.error) {
-          alert(data.error || "Room does not exist. Double-check the code and try again.");
+          setJoinFeedback({
+            tone: "error",
+            message: data.error || "Room does not exist. Double-check the code and try again.",
+          });
           return;
         }
+        setJoinFeedback({ tone: "success", message: "Room found! Redirecting…" });
         window.location.href = `/room/${trimmed}`;
       } catch (error) {
         console.error("Failed to verify room", error);
-        alert("We couldn't verify that room. Try again in a moment.");
+        setJoinFeedback({
+          tone: "error",
+          message: "We couldn't verify that room. Try again in a moment.",
+        });
       }
     });
   }
@@ -127,7 +140,10 @@ export default function HomePage() {
           <form onSubmit={handleJoin} className={styles.form}>
             <input
               value={roomInput}
-              onChange={(e) => setRoomInput(e.target.value)}
+              onChange={(e) => {
+                setRoomInput(e.target.value);
+                if (joinFeedback) setJoinFeedback(null);
+              }}
               placeholder="Enter a room code"
               className={styles.input}
               maxLength={24}
@@ -139,6 +155,13 @@ export default function HomePage() {
           <button type="button" className={styles.createButton} onClick={handleCreate}>
             Create a new room
           </button>
+          {joinFeedback && (
+            <HomeJoinNotice
+              tone={joinFeedback.tone}
+              message={joinFeedback.message}
+              onClose={() => setJoinFeedback(null)}
+            />
+          )}
         </div>
       </section>
 
