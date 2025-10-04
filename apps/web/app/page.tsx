@@ -1,18 +1,45 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import styles from "./HomePage.module.css";
 
 export default function HomePage() {
-  const { data: session } = useSession();
+  const router = useRouter();
+  const { data: session, status } = useSession();
   const [roomInput, setRoomInput] = useState("");
+  const [message, setMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      setMessage("Please log in before using CodeCollab.");
+    }
+    if (status === "authenticated") {
+      setMessage(null);
+    }
+  }, [status]);
+
+  function requireAuth(action: () => void) {
+    if (status !== "authenticated") {
+      setMessage("Please log in before using CodeCollab.");
+      return;
+    }
+    action();
+  }
 
   function handleJoin(e: React.FormEvent) {
     e.preventDefault();
     if (!roomInput.trim()) return;
-    window.location.href = `/room/${roomInput.trim()}`;
+    requireAuth(() => {
+      window.location.href = `/room/${roomInput.trim()}`;
+    });
+  }
+
+  function handleCreate() {
+    requireAuth(() => {
+      router.push("/create-room");
+    });
   }
 
   return (
@@ -56,10 +83,14 @@ export default function HomePage() {
             Join Room
           </button>
         </form>
-        <Link href="/create-room" className={styles.createLink}>
-          <button className={styles.createButton}>Create Room</button>
-        </Link>
+        <div className={styles.createLink}>
+          <button type="button" className={styles.createButton} onClick={handleCreate}>
+            Create Room
+          </button>
+        </div>
       </div>
+
+      {message && <div className={styles.notice}>{message}</div>}
 
       <p className={styles.tip}>
         <b>Tip:</b> Share your room code to collaborate instantly.

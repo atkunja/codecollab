@@ -2,18 +2,23 @@
 
 import { useState } from "react";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import styles from "./CreateRoom.module.css";
 
 export default function CreateRoomPage() {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [name, setName] = useState("");
   const [roomId, setRoomId] = useState("");
   const [message, setMessage] = useState("");
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
+    if (!session?.user?.email) {
+      setMessage("Please log in before using CodeCollab.");
+      return;
+    }
     if (!name.trim()) {
       setMessage("Room name required.");
       return;
@@ -30,7 +35,7 @@ export default function CreateRoomPage() {
       body: JSON.stringify({
         name,
         id: roomId || undefined,
-        creatorEmail: session?.user?.email || "",
+        creatorEmail: session.user.email,
       }),
     });
     const data = await res.json();
@@ -40,6 +45,24 @@ export default function CreateRoomPage() {
     } else {
       setMessage(data.error || "Failed to create room.");
     }
+  }
+
+  if (status === "loading") {
+    return <div className={styles.container}>Loading...</div>;
+  }
+
+  if (status === "unauthenticated") {
+    return (
+      <div className={styles.container}>
+        <div className={styles.authGuard}>
+          <div className={styles.title}>Create Room</div>
+          <p className={styles.guardText}>Please log in before using CodeCollab.</p>
+          <Link href="/login" className={styles.guardButton}>
+            Go to login
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -85,3 +85,35 @@
   font-size: 1rem;
   text-align: center;
 }
+
+.authGuard {
+  background: rgba(23, 25, 45, 0.92);
+  border-radius: 1.2rem;
+  padding: 3rem 2.5rem;
+  text-align: center;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
+  max-width: 420px;
+}
+
+.guardText {
+  margin-top: 1rem;
+  font-size: 1.1rem;
+  color: #e7e9ff;
+}
+
+.guardButton {
+  display: inline-block;
+  margin-top: 1.5rem;
+  padding: 0.75rem 2rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #4fd1c5 10%, #5b6ee1 90%);
+  color: #17192d;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.guardButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 28px rgba(91, 110, 225, 0.35);
+}

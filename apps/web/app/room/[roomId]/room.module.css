@@ -118,3 +118,35 @@
   border-radius: 5px;
   border: 1px solid #232334;
 }
+
+.loginPrompt {
+  max-width: 420px;
+  margin: 80px auto;
+  padding: 32px;
+  background: rgba(17, 17, 26, 0.9);
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+}
+
+.unauthText {
+  margin: 12px 0 24px;
+  color: #f1f1f6;
+  font-size: 1.1rem;
+}
+
+.loginButton {
+  display: inline-block;
+  padding: 10px 22px;
+  border-radius: 999px;
+  background: #4fd1c5;
+  color: #181824;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.loginButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(79, 209, 197, 0.35);
+}

@@ -1,10 +1,12 @@
 "use client";
-import styles from "./room.module.css";
-import { use } from "react";
-import { useSession } from "next-auth/react";
+
 import { useEffect, useRef, useState } from "react";
-import io, { Socket } from "socket.io-client";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
 import dynamic from "next/dynamic";
+import io, { Socket } from "socket.io-client";
+
+import styles from "./room.module.css";
 
 // Monaco Editor import (no SSR)
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
@@ -12,9 +14,9 @@ const MonacoEditor = dynamic(() => import("@monaco-editor/react"), { ssr: false 
 type User = { email: string; name?: string; image?: string };
 type Message = { sender: string; message: string; created_at?: string };
 
-export default function RoomPage({ params }: { params: Promise<{ roomId: string }> }) {
-  const { roomId } = use(params);
-  const { data: session } = useSession();
+export default function RoomPage({ params }: { params: { roomId: string } }) {
+  const { data: session, status } = useSession();
+  const { roomId } = params;
 
   // Use a ref so socket is not recreated every render
   const socketRef = useRef<Socket | null>(null);
@@ -140,7 +142,36 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
     setChatInput("");
   }
 
-  if (loading) return <div className={styles.container}>Loading...</div>;
+  if (status === "loading" || loading) {
+    return <div className={styles.container}>Loading...</div>;
+  }
+
+  if (status === "unauthenticated") {
+    return (
+      <div className={styles.container}>
+        <div className={styles.loginPrompt}>
+          <h1 className={styles.header}>Room: {roomId}</h1>
+          <p className={styles.unauthText}>Please log in before using CodeCollab.</p>
+          <Link href="/login" className={styles.loginButton}>
+            Go to login
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (!session?.user?.email) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.loginPrompt}>
+          <p className={styles.unauthText}>Please log in before using CodeCollab.</p>
+          <Link href="/login" className={styles.loginButton}>
+            Go to login
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>
