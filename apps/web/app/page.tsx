@@ -65,11 +65,24 @@ export default function HomePage() {
     action();
   }
 
-  function handleJoin(e: React.FormEvent) {
+  async function handleJoin(e: React.FormEvent) {
     e.preventDefault();
-    if (!roomInput.trim()) return;
-    requireAuth(() => {
-      window.location.href = `/room/${roomInput.trim()}`;
+    const trimmed = roomInput.trim();
+    if (!trimmed) return;
+
+    requireAuth(async () => {
+      try {
+        const res = await fetch(`/api/rooms/${trimmed}`);
+        const data = await res.json();
+        if (!res.ok || data.error) {
+          alert(data.error || "Room does not exist. Double-check the code and try again.");
+          return;
+        }
+        window.location.href = `/room/${trimmed}`;
+      } catch (error) {
+        console.error("Failed to verify room", error);
+        alert("We couldn't verify that room. Try again in a moment.");
+      }
     });
   }
 
