@@ -107,7 +107,6 @@ export default function RoomClient({ roomId }: RoomClientProps) {
 
   async function handleDeleteRoom() {
     if (!roomId || !session?.user?.email) return;
-    if (!window.confirm("Are you sure you want to delete this room? This cannot be undone.")) return;
     setDeleting(true);
     const res = await fetch(`/api/rooms/${roomId}`, {
       method: "DELETE",
@@ -117,7 +116,6 @@ export default function RoomClient({ roomId }: RoomClientProps) {
     const data = await res.json();
     setDeleting(false);
     if (data.success) {
-      alert("Room deleted!");
       window.location.href = "/";
     } else {
       alert(data.error || "Could not delete room.");
