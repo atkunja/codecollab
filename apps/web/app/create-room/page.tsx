@@ -68,7 +68,12 @@ export default function CreateRoomPage() {
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <h1 className={styles.title}>Create a room</h1>
+        <div className={styles.cardHeader}>
+          <h1 className={styles.title}>Create a room</h1>
+          <button type="button" className={styles.backButton} onClick={() => router.back()}>
+            Back
+          </button>
+        </div>
         <p className={styles.subtitle}>Name your space, optionally add a custom code, and start collaborating instantly.</p>
         <form className={styles.form} onSubmit={handleCreate}>
           <input

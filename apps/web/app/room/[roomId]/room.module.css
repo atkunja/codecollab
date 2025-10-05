@@ -17,6 +17,12 @@
   flex-wrap: wrap;
 }
 
+.topActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .roomMeta {
   display: flex;
   flex-direction: column;
@@ -60,6 +66,29 @@
   transition: transform 0.1s ease, box-shadow 0.1s ease;
   cursor: pointer;
   box-shadow: 0 12px 30px rgba(245, 71, 71, 0.35);
+}
+
+.leaveBtn {
+  background: rgba(13, 17, 29, 0.9);
+  color: #d5e4ff;
+  border: 1px solid rgba(103, 230, 220, 0.25);
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  box-shadow: 0 12px 24px rgba(91, 110, 225, 0.2);
+}
+
+.leaveBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.leaveBtn:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 32px rgba(103, 230, 220, 0.25);
 }
 
 .deleteBtn:disabled {
@@ -400,6 +429,12 @@
     padding: 20px;
   }
 
+  .topActions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .toolbar {
     flex-direction: column;
     align-items: stretch;
@@ -414,6 +449,10 @@
   }
 
   .deleteBtn {
+    width: 100%;
+  }
+
+  .leaveBtn {
     width: 100%;
   }
 

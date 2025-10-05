@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import type { Socket } from "socket.io-client";
 import io from "socket.io-client";
 
@@ -20,6 +21,7 @@ type RoomClientProps = {
 
 export default function RoomClient({ roomId }: RoomClientProps) {
   const { data: session, status } = useSession();
+  const router = useRouter();
 
   const socketRef = useRef<Socket | null>(null);
 
@@ -37,6 +39,7 @@ export default function RoomClient({ roomId }: RoomClientProps) {
   const [runError, setRunError] = useState<string | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [lastRun, setLastRun] = useState<string | null>(null);
+  const [leaving, setLeaving] = useState(false);
 
   useEffect(() => {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") || "http://localhost:3001";
@@ -181,6 +184,16 @@ export default function RoomClient({ roomId }: RoomClientProps) {
     }
   }
 
+  function handleLeaveRoom() {
+    if (leaving) return;
+    setLeaving(true);
+    if (socketRef.current) {
+      socketRef.current.disconnect();
+      socketRef.current = null;
+    }
+    router.push("/");
+  }
+
   if (status === "loading" || loading) {
     return <div className={styles.page}>Loading…</div>;
   }
@@ -227,16 +240,26 @@ export default function RoomClient({ roomId }: RoomClientProps) {
             </p>
           )}
         </div>
-        {session.user.email && roomInfo?.creator_email === session.user.email && (
+        <div className={styles.topActions}>
           <button
             type="button"
-            onClick={handleDeleteRoom}
-            disabled={deleting}
-            className={styles.deleteBtn}
+            onClick={handleLeaveRoom}
+            className={styles.leaveBtn}
+            disabled={leaving}
           >
-            {deleting ? "Deleting…" : "Delete room"}
+            {leaving ? "Leaving…" : "Leave room"}
           </button>
-        )}
+          {session.user.email && roomInfo?.creator_email === session.user.email && (
+            <button
+              type="button"
+              onClick={handleDeleteRoom}
+              disabled={deleting}
+              className={styles.deleteBtn}
+            >
+              {deleting ? "Deleting…" : "Delete room"}
+            </button>
+          )}
+        </div>
       </header>
 
       {joinError && <div className={styles.errorBanner}>Error: {joinError}</div>}
