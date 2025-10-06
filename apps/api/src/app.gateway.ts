@@ -11,7 +11,15 @@ import {
 import { Server, Socket } from 'socket.io';
 import { supabase } from './supabase';
 
-@WebSocketGateway({ cors: { origin: '*' } })
+const allowedOrigins = process.env.WEB_ORIGIN?.split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+@WebSocketGateway({
+  cors: {
+    origin: allowedOrigins?.length ? allowedOrigins : '*',
+  },
+})
 export class AppGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {

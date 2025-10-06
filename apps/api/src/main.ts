@@ -14,6 +14,15 @@ async function bootstrap() {
     next();
   });
 
+  const allowedOrigins = process.env.WEB_ORIGIN?.split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
+  app.enableCors({
+    origin: allowedOrigins?.length ? allowedOrigins : true,
+    credentials: true,
+  });
+
   const port = Number(process.env.PORT) || 3000;
   await app.listen(port, '0.0.0.0');
   // Optional: console.log so you can see it start up locally
